@@ -42,7 +42,6 @@ namespace Talabat.Apis.Middlewares
 				};
 				var JsonResponse = JsonSerializer.Serialize(Response, Options);
 				await context.Response.WriteAsync(JsonResponse);
-
 			}
 		}
 	}
