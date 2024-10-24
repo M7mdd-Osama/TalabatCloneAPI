@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Talabat.Apis.Controllers
 {
-	[ApiController]
-	[Route("api/[controller]")]
-	public class WeatherForecastController : ControllerBase
+	public class WeatherForecastController : APIBaseController
 	{
 		private static readonly string[] Summaries = new[]
 		{
