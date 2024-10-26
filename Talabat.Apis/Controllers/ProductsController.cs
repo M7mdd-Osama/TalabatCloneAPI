@@ -28,13 +28,15 @@ namespace Talabat.Apis.Controllers
 			_brandRepo = BrandRepo;
 		}
 		[HttpGet]
-		public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts([FromQuery]ProductSpecParams Params)
+		public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts([FromQuery] ProductSpecParams Params)
 		{
 			var Spec = new ProductWithBrandAndTypeSpecifications(Params);
 			var Products = await _productRepo.GetAllWithSpecAsync(Spec);
 			var MappedProducts = _mapper.Map<IReadOnlyList<Product>, IReadOnlyList<ProductToReturnDto>>(Products);
 
-			return Ok(new Pagination<ProductToReturnDto>(Params.PageIndex, Params.PageSize, MappedProducts));
+			var CountSpec = new ProductWithFilterationForCountAsync(Params);
+			var Count = await _productRepo.GetCountWithSpecAsync(CountSpec);
+			return Ok(new Pagination<ProductToReturnDto>(Params.PageIndex, Params.PageSize, MappedProducts, Count));
 		}
 
 		[HttpGet("{id}")]
