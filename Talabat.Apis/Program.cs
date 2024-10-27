@@ -47,7 +47,7 @@ namespace Talabat.Apis
 
 			builder.Services.AddApplicationServices();
 
-			builder.Services.AddIdentityServices();
+			builder.Services.AddIdentityServices(builder.Configuration);
 
 
 
@@ -83,19 +83,16 @@ namespace Talabat.Apis
 			#region Configure - Configure the HTTP request pipeline.                                                    
 
 			// Configure the HTTP request pipeline.
-			app.UseMiddleware<ExceptionMiddleWare>();
 			if (app.Environment.IsDevelopment())
 			{
+			app.UseMiddleware<ExceptionMiddleWare>();
 				app.UseSwaggerMiddlewares();
 			}
-
 			app.UseStatusCodePagesWithReExecute("/errors/{0}");
-
 			app.UseHttpsRedirection();
-
-			app.UseAuthorization();
 			app.UseStaticFiles();
-
+			app.UseAuthentication();
+			app.UseAuthorization();
 			app.MapControllers();
 
 			#endregion

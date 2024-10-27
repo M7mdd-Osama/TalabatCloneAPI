@@ -23,7 +23,7 @@ namespace Talabat.Core.Specifications
 
 		private string? search;
 
-		public string Search
+		public string? Search
 		{
 			get { return search; }
 			set { search = value; }
