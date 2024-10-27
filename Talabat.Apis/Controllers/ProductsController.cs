@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Talabat.Apis.DTOs;
@@ -27,6 +29,7 @@ namespace Talabat.Apis.Controllers
 			_typeRepo = TypeRepo;
 			_brandRepo = BrandRepo;
 		}
+		[Authorize]
 		[HttpGet]
 		public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts([FromQuery] ProductSpecParams Params)
 		{

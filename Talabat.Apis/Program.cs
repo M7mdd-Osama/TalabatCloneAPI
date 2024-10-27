@@ -1,13 +1,17 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 using Talabat.Apis.Errors;
 using Talabat.Apis.Extensions;
 using Talabat.Apis.Helpers;
 using Talabat.Apis.Middlewares;
 using Talabat.Core.Entities;
+using Talabat.Core.Entities.Identity;
 using Talabat.Core.Repositories;
 using Talabat.Repository;
 using Talabat.Repository.Data;
+using Talabat.Repository.Identity;
 
 namespace Talabat.Apis
 {
@@ -27,9 +31,24 @@ namespace Talabat.Apis
 			{
 				Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 			});
-			//builder.Services.AddScoped<IGenericRepository<Product> , GenericRepository<Product>>();
+
+			builder.Services.AddDbContext<AppIdentityDbContext>(Options =>
+			{
+				Options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+			});
+
+
+			builder.Services.AddSingleton<IConnectionMultiplexer>(Options =>
+			{
+				var Connection = builder.Configuration.GetConnectionString("RedisConnection");
+
+				return ConnectionMultiplexer.Connect(Connection);
+			});
 
 			builder.Services.AddApplicationServices();
+
+			builder.Services.AddIdentityServices(builder.Configuration);
+
 
 
 			#endregion
@@ -44,6 +63,13 @@ namespace Talabat.Apis
 			{
 				var dbContext = Services.GetRequiredService<StoreContext>();
 				await dbContext.Database.MigrateAsync();
+
+				var IdentityDbContext = Services.GetRequiredService<AppIdentityDbContext>();
+				await IdentityDbContext.Database.MigrateAsync();
+
+				var UserManager = Services.GetRequiredService<UserManager<AppUser>>();
+				await AppIdentityDbContextSeed.SeedUserAsync(UserManager);
+
 				await StoreContextSeed.SeedAsync(dbContext);
 			}
 			catch (Exception ex)
@@ -57,19 +83,16 @@ namespace Talabat.Apis
 			#region Configure - Configure the HTTP request pipeline.                                                    
 
 			// Configure the HTTP request pipeline.
-			app.UseMiddleware<ExceptionMiddleWare>();
 			if (app.Environment.IsDevelopment())
 			{
+			app.UseMiddleware<ExceptionMiddleWare>();
 				app.UseSwaggerMiddlewares();
 			}
-
 			app.UseStatusCodePagesWithReExecute("/errors/{0}");
-
 			app.UseHttpsRedirection();
-
-			app.UseAuthorization();
 			app.UseStaticFiles();
-
+			app.UseAuthentication();
+			app.UseAuthorization();
 			app.MapControllers();
 
 			#endregion

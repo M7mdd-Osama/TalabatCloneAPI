@@ -11,6 +11,8 @@ namespace Talabat.Core.Specifications
 	{
 		public ProductWithFilterationForCountAsync(ProductSpecParams Params)
 			: base(P =>
+			(string.IsNullOrEmpty(Params.Search) || P.Name.ToLower().Contains(Params.Search))
+			&&
 			(!Params.BrandId.HasValue || P.ProductBrandId == Params.BrandId)
 			&&
 			(!Params.TypeId.HasValue || P.ProductTypeId == Params.TypeId)
