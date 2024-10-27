@@ -27,6 +27,7 @@ namespace Talabat.Apis.Controllers
 			_typeRepo = TypeRepo;
 			_brandRepo = BrandRepo;
 		}
+		
 		[HttpGet]
 		public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts([FromQuery] ProductSpecParams Params)
 		{
