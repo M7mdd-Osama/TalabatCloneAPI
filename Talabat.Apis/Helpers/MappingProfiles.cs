@@ -15,6 +15,9 @@ namespace Talabat.Apis.Helpers
 					 .ForMember(D => D.PictureUrl, O => O.MapFrom<ProductPictureUrlResolver>());
 
 			CreateMap<Address, AddressDto>().ReverseMap();
+
+			CreateMap<CustomerBasketDto, CustomerBasket>();
+			CreateMap<BasketItemDto, BasketItem>();
 		}
 	}
 }
